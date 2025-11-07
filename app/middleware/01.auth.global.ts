@@ -2,59 +2,45 @@ import * as jose from "jose";
 
 export default defineNuxtRouteMiddleware((to, from) => {
   const { user, loggedIn } = useAuth();
-
-  //   console.log("🔍 Global auth middleware executing", {
-  //     server: import.meta.server,
-  //     client: import.meta.client,
-  //     to: to.path,
-  //     from: from?.path,
-  //   });
-
   const token = useCookie("auth.token");
 
-  if (import.meta.server) {
-    // console.log("🔧 SERVER: Global auth middleware on server side", {
-    //   token: token.value,
-    //   path: to.path,
-    // });
+  //   console.log("🔍 Global auth middleware executing", {
+  //   server: import.meta.server,
+  //   client: import.meta.client,
+  // to: to.name,
+  //   from: from?.path,
+  //   });
 
+  if (import.meta.server) {
     if (token.value) {
       const claims: any = jose.decodeJwt(token.value);
-      //   console.log(claims);
       user.value = claims.username;
       loggedIn.value = true;
     } else {
       user.value = null;
       loggedIn.value = false;
     }
-
-    if ((to.path === "/login" || to.path === "/") && loggedIn.value) {
-      return navigateTo("/dashboard");
-    }
   }
 
-  if (import.meta.client) {
-    // console.log("🔧 CLIENT: Global auth middleware on client side", {
-    //   token: token.value,
-    //   path: to.path,
-    // });
+  //   ? Leaving this here in case I need to capture client render
+  //   if (import.meta.client) {}
 
-    // console.log("🔧 CLIENT: Logged In State:", loggedIn.value);
+  //   ? Leaving this here in case I need to capture initial client load
+  //   const nuxtApp = useNuxtApp();
+  //   if (
+  //     import.meta.client &&
+  //     nuxtApp.isHydrating &&
+  //     nuxtApp.payload.serverRendered
+  //   ) {
+  //   }
 
-    if ((to.path === "/login" || to.path === "/") && loggedIn.value) {
-      return navigateTo("/dashboard");
-    }
+  const unprotectedRoutes = ["login", "index"];
+  if (unprotectedRoutes.includes(to.name as string) && loggedIn.value) {
+    return navigateTo("/dashboard");
   }
 
-  const nuxtApp = useNuxtApp();
-  if (
-    import.meta.client &&
-    nuxtApp.isHydrating &&
-    nuxtApp.payload.serverRendered
-  ) {
-    // console.log(
-    //   "Global auth middleware during initial client load",
-    //   token.value
-    // );
+  const protectedRoutes = ["dashboard", "deployment-name"];
+  if (protectedRoutes.includes(to.name as string) && !loggedIn.value) {
+    return navigateTo("/login");
   }
 });

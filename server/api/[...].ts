@@ -19,7 +19,6 @@ export default defineEventHandler(async (event) => {
       ...event.req.headers,
       Authorization: token ? `Bearer ${token}` : "",
     },
-    credentials: "include",
   };
 
   if (body) {

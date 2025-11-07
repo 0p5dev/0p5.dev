@@ -16,6 +16,8 @@
 import * as z from "zod";
 import type { FormSubmitEvent, AuthFormField } from "@nuxt/ui";
 
+const { loggedIn, user } = useAuth();
+
 const fields: AuthFormField[] = [
   {
     name: "username",
@@ -46,9 +48,9 @@ type Schema = z.output<typeof schema>;
 
 const loading = ref<boolean>(false);
 async function onSubmit(payload: FormSubmitEvent<Schema>): Promise<void> {
-  console.log("Submitted", payload.data);
+  loading.value = true;
   try {
-    const res = await $fetch("/api/auth/login", {
+    const res = await $fetch<any>("/api/auth/login", {
       method: "POST",
       body: {
         username: payload.data.username,
@@ -56,9 +58,13 @@ async function onSubmit(payload: FormSubmitEvent<Schema>): Promise<void> {
       },
       credentials: "include",
     });
+    loggedIn.value = res.loggedIn;
+    user.value = res.user;
     await navigateTo("/dashboard");
   } catch (err: any) {
     console.log("Error during login", err);
+  } finally {
+    loading.value = false;
   }
 }
 </script>
