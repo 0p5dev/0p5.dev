@@ -1,6 +1,11 @@
 <template>
   <UContainer>
-    <p v-if="status === 'pending'">Loading deployments...</p>
+    <div
+      class="w-screen h-screen overflow-hidden grid place-content-center"
+      v-if="status === 'pending'"
+    >
+      <UIcon name="svg-spinners:3-dots-bounce" />
+    </div>
     <p v-else-if="status === 'error'">Error loading deployments: {{ error }}</p>
     <div v-else-if="status === 'success'">
       <UPageHeader title="Your Deployments" :ui="{ root: 'border-b-0' }" />

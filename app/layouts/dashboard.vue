@@ -1,6 +1,6 @@
 <template>
   <div>
-    <UHeader>
+    <UHeader :toggle="false">
       <template #left>
         <h1 class="text-xl font-semibold">0p5.dev</h1>
       </template>

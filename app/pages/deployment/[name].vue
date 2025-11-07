@@ -1,6 +1,18 @@
 <template>
   <UContainer>
-    <p v-if="status === 'pending'">Loading deployment...</p>
+    <div
+      class="w-full h-[85vh] overflow-hidden gap-5 grid place-content-center text-center"
+      v-if="status === 'pending'"
+    >
+      <UCard variant="subtle">
+        <p>Retrieving deployment information</p>
+        <UIcon
+          name="svg-spinners:blocks-shuffle-3"
+          size="35"
+          class="mx-auto mt-5"
+        />
+      </UCard>
+    </div>
     <p v-else-if="status === 'error'">Error loading deployments: {{ error }}</p>
     <div v-else-if="status === 'success'">
       <UPageHeader :title="deployment.name" :ui="{ root: 'border-b-0' }">
@@ -84,6 +96,25 @@ definePageMeta({
   layout: "dashboard",
 });
 
+// Split text into individual letters for wave animation
+onMounted(() => {
+  const waveElements = document.querySelectorAll(".wave-text");
+  waveElements.forEach((element) => {
+    const text = element.textContent || "";
+    element.innerHTML = text
+      .split("")
+      .map((char, index) => {
+        if (char === " ") {
+          return '<span class="wave-letter">&nbsp;</span>';
+        }
+        return `<span class="wave-letter" style="animation-delay: ${
+          index * 0.1
+        }s">${char}</span>`;
+      })
+      .join("");
+  });
+});
+
 const {
   data: deployment,
   status,
@@ -145,5 +176,3 @@ const cpuXFormatter = (i: number) => {
   return `${totalHours - cpuData.value[i].x} hours ago`;
 };
 </script>
-
-<style scoped></style>

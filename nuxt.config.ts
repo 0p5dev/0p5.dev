@@ -5,4 +5,8 @@ export default defineNuxtConfig({
   modules: ["@nuxt/ui", "@nuxt/image", "nuxt-charts"],
   css: ["~/assets/css/main.css"],
   ssr: true,
+  app: {
+    pageTransition: { name: "pl", mode: "out-in" },
+    layoutTransition: { name: "pl", mode: "out-in" },
+  },
 });
