@@ -14,16 +14,34 @@
       </UCard>
     </div>
     <p v-else-if="status === 'error'">Error loading deployments: {{ error }}</p>
-    <div v-else-if="status === 'success'">
-      <UPageHeader :title="deployment.name" :ui="{ root: 'border-b-0' }">
-        <template #headline>
+    <div v-else-if="status === 'success'" class="py-5">
+      <UButton
+        variant="ghost"
+        color="neutral"
+        size="lg"
+        to="/dashboard"
+        icon="ph:arrow-bend-double-up-left-duotone"
+        label="Back to dashboard"
+      />
+      <UPageCard
+        variant="subtle"
+        :ui="{ body: 'sm:p-4' }"
+        orientation="horizontal"
+        class="my-5"
+      >
+        <!-- <div class="flex justify-between items-center"> -->
+        <template #header>
+          <!-- <div class="flex justify-between items-center"> -->
           <UBadge
             :color="deployment.status === 'Ready' ? 'success' : 'error'"
             :label="deployment.status"
+            class="mb-3"
           />
+          <h3 class="text-3xl font-semibold">{{ deployment.name }}</h3>
+          <!-- </div> -->
         </template>
-        <template #description>
-          <div class="flex gap-1 items-center">
+        <UCard>
+          <div class="flex gap-1 items-center mb-4">
             <p>First deployed</p>
             <UIcon name="ph:dot-duotone" />
             <p>
@@ -35,6 +53,10 @@
                 })
               }}
             </p>
+            <UIcon name="ph:dot-duotone" />
+            <UBadge color="neutral" variant="soft">{{
+              useTimeAgo(deployment.created_time)
+            }}</UBadge>
           </div>
           <div class="flex gap-1 items-center">
             <p>Last deployed</p>
@@ -48,9 +70,14 @@
                 })
               }}
             </p>
+            <UIcon name="ph:dot-duotone" />
+            <UBadge color="neutral" variant="soft">{{
+              useTimeAgo(deployment.updated_time)
+            }}</UBadge>
           </div>
-        </template>
-      </UPageHeader>
+        </UCard>
+        <!-- </div> -->
+      </UPageCard>
       <UPageFeature
         title="URL"
         :description="deployment.url"
@@ -92,27 +119,10 @@
 </template>
 
 <script setup lang="ts">
+import { useTimeAgo } from "@vueuse/core";
+
 definePageMeta({
   layout: "dashboard",
-});
-
-// Split text into individual letters for wave animation
-onMounted(() => {
-  const waveElements = document.querySelectorAll(".wave-text");
-  waveElements.forEach((element) => {
-    const text = element.textContent || "";
-    element.innerHTML = text
-      .split("")
-      .map((char, index) => {
-        if (char === " ") {
-          return '<span class="wave-letter">&nbsp;</span>';
-        }
-        return `<span class="wave-letter" style="animation-delay: ${
-          index * 0.1
-        }s">${char}</span>`;
-      })
-      .join("");
-  });
 });
 
 const {
