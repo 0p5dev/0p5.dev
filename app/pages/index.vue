@@ -29,10 +29,9 @@
         </div>
       </template>
       <code class="leading-8">
-        curl -LO
-        https://github.com/Digizyne/cli/releases/latest/download/lf-amd64.deb
+        curl -LO https://github.com/0p5dev/ops/releases/download/0.1.0/ops
         <br />
-        sudo apt install ./lf-amd64.deb &amp;&amp; rm ./lf-amd64.deb
+        chmod +x ./ops &amp;&amp; sudo mv ./ops /usr/local/bin/ops
       </code>
     </UCard>
   </div>
@@ -42,8 +41,8 @@
 const textCopied = ref<boolean>(false);
 function copyCommandsToClipboard() {
   const commands = `
-        curl -LO https://github.com/Digizyne/cli/releases/latest/download/lf-amd64.deb
-        sudo apt install ./lf-amd64.deb && rm ./lf-amd64.deb
+        curl -LO https://github.com/0p5dev/ops/releases/download/0.1.0/ops
+        chmod +x ./ops && sudo mv ./ops /usr/local/bin/ops
         `;
   navigator.clipboard.writeText(commands);
   textCopied.value = true;
