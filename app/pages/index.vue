@@ -48,7 +48,7 @@
         </div>
       </template>
       <code class="leading-8">
-        curl -LO https://github.com/0p5dev/ops/releases/download/0.1.1/ops
+        curl -LO https://github.com/0p5dev/ops/releases/download/v0.1.1/ops
         <br />
         chmod +x ./ops &amp;&amp; sudo mv ./ops /usr/local/bin/ops
       </code>
@@ -60,7 +60,7 @@
 const textCopied = ref<boolean>(false);
 function copyCommandsToClipboard() {
   const commands = `
-        curl -LO https://github.com/0p5dev/ops/releases/download/0.1.1/ops
+        curl -LO https://github.com/0p5dev/ops/releases/download/v0.1.1/ops
         chmod +x ./ops && sudo mv ./ops /usr/local/bin/ops
         `;
   navigator.clipboard.writeText(commands);
