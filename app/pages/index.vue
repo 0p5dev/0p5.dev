@@ -48,7 +48,7 @@
         </div>
       </template>
       <code class="leading-8">
-        curl -LO https://github.com/0p5dev/ops/releases/download/0.1.0/ops
+        curl -LO https://github.com/0p5dev/ops/releases/download/0.1.1/ops
         <br />
         chmod +x ./ops &amp;&amp; sudo mv ./ops /usr/local/bin/ops
       </code>
@@ -60,7 +60,7 @@
 const textCopied = ref<boolean>(false);
 function copyCommandsToClipboard() {
   const commands = `
-        curl -LO https://github.com/0p5dev/ops/releases/download/0.1.0/ops
+        curl -LO https://github.com/0p5dev/ops/releases/download/0.1.1/ops
         chmod +x ./ops && sudo mv ./ops /usr/local/bin/ops
         `;
   navigator.clipboard.writeText(commands);
@@ -76,12 +76,12 @@ const features = [
     icon: "ph:arrows-out-duotone",
   },
   {
-    title: "Deploy with one command",
+    title: "Deploy with 1 command",
     icon: "ph:rocket-launch-duotone",
   },
   {
-    title: "No configuration beyond Dockerfile",
-    icon: "ph:book-open-duotone",
+    title: "No additional configuration",
+    icon: "ph:book-open-text-duotone",
   },
   {
     title: "High availability by default",
