@@ -12,6 +12,7 @@
   "dependencies": {
     "@nuxt/image": "^1.11.0",
     "@nuxt/ui": "^4.1.0",
+    "cookie": "0.6.0",
     "jose": "^6.1.0",
     "nuxt": "^4.2.0",
     "nuxt-charts": "^1.0.2",
@@ -19,5 +20,11 @@
     "vue": "^3.5.22",
     "vue-router": "^4.6.3",
     "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@nuxtjs/supabase": "^2.0.1"
+  },
+  "overrides": {
+    "cookie": "0.6.0"
   }
 }

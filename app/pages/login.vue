@@ -3,9 +3,10 @@
     <UPageCard class="w-xs">
       <UAuthForm
         :schema="schema"
-        :fields="fields"
+        :providers="providers"
         @submit="onSubmit"
         :submit="{ label: 'Login', loading, size: 'xl', class: 'mt-3' }"
+        :ui="{ providers: 'space-y-5' }"
       >
         <template #title>
           <p class="text-xl text-pretty font-semibold text-highlighted">
@@ -23,6 +24,58 @@ import * as z from "zod";
 import type { FormSubmitEvent, AuthFormField } from "@nuxt/ui";
 
 const { loggedIn, user } = useAuth();
+const toast = useToast();
+const supabase = useSupabaseClient();
+
+async function loginWithGoogle() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: "http://localhost:3000/dashboard",
+    },
+  });
+  if (error) {
+    toast.add({ title: "Error", description: error.message, color: "error" });
+  } else {
+    toast.add({
+      title: "Redirecting",
+      description: "You will be redirected to Google for authentication.",
+    });
+  }
+}
+
+async function loginWithGitHub() {
+  console.log("Logging in with GitHub");
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "github",
+    options: {
+      redirectTo: "http://localhost:3000/",
+    },
+  });
+  if (error) {
+    console.log("GitHub login error:", error);
+    toast.add({ title: "Error", description: error.message, color: "error" });
+  } else {
+    toast.add({
+      title: "Redirecting",
+      description: "You will be redirected to GitHub for authentication.",
+    });
+  }
+  console.log("GitHub login data:", data);
+}
+
+const providers = [
+  {
+    label: "Google",
+    icon: "i-simple-icons-google",
+    onClick: loginWithGoogle,
+  },
+  {
+    label: "GitHub",
+    icon: "i-simple-icons-github",
+    onClick: loginWithGitHub,
+  },
+];
 
 const fields: AuthFormField[] = [
   {
