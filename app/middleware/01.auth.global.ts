@@ -36,11 +36,11 @@ export default defineNuxtRouteMiddleware((to, from) => {
 
   const unprotectedRoutes = ["login", "index"];
   if (unprotectedRoutes.includes(to.name as string) && loggedIn.value) {
-    return navigateTo("/dashboard");
+    // return navigateTo("/dashboard");
   }
 
   const protectedRoutes = ["dashboard", "deployment-name"];
   if (protectedRoutes.includes(to.name as string) && !loggedIn.value) {
-    return navigateTo("/login");
+    // return navigateTo("/login");
   }
 });

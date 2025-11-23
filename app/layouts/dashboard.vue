@@ -20,15 +20,17 @@
 
 <script setup lang="ts">
 const { user, loggedIn } = useAuth();
+const supabase = useSupabaseClient();
 
 const loading = ref<boolean>(false);
 async function logout() {
   loading.value = true;
   try {
-    await $fetch("/api/auth/logout", {
-      method: "POST",
-      credentials: "include",
-    });
+    // await $fetch("/api/auth/logout", {
+    //   method: "POST",
+    //   credentials: "include",
+    // });
+    await supabase.auth.signOut();
     loggedIn.value = false;
     user.value = null;
     await navigateTo("/login");
