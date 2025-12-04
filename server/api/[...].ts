@@ -20,17 +20,17 @@ export default defineEventHandler(async (event) => {
       accessToken = decodedToken.substring(quotes[2] + 1, quotes[3]);
     }
   }
-  console.log("Access token:", accessToken);
+  // console.log("Access token:", accessToken);
   let body = null;
   if (isMethod(event, "POST")) {
     body = await readBody(event);
   }
 
-  console.log(
-    `Proxying request to backend: ${pathName} with token ${
-      token ? "present" : "absent"
-    }`
-  );
+  // console.log(
+  //   `Proxying request to backend: ${pathName} with token ${
+  //     token ? "present" : "absent"
+  //   }`
+  // );
 
   let options: any = {
     method: event.req.method,

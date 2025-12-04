@@ -12,7 +12,7 @@
       <UPageGrid>
         <UPageCard
           v-for="deployment in data.deployments"
-          :key="deployment.name"
+          :key="deployment.id"
           :title="deployment.name"
           :to="`/deployment/${deployment.name}`"
         >

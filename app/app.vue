@@ -9,11 +9,13 @@
 
 <script lang="ts" setup>
 const user = useSupabaseUser();
-watchEffect(() => {
-  console.log("Supabase user changed:", user.value);
+watch(user, (newUser, oldUser) => {
+  if (oldUser === null && newUser !== null) {
+    return navigateTo("/dashboard");
+  }
 });
-onMounted(async () => {
-  const res = await $fetch("/api/health");
-  console.log("Health check response:", res);
-});
+// onMounted(async () => {
+//   const res = await $fetch("/api/health");
+//   console.log("Health check response:", res);
+// });
 </script>

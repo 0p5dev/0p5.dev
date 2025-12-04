@@ -18,7 +18,7 @@ export default defineNuxtConfig({
   supabase: {
     url: process.env.NUXT_SUPABASE_URL,
     key: process.env.NUXT_SUPABASE_API_KEY,
-    redirect: false,
     cookiePrefix: "0p5dev",
+    redirect: false,
   },
 });
