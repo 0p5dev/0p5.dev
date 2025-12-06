@@ -1,6 +1,7 @@
 steps:
   - id: Build container image with buildah
     name: quay.io/buildah/stable:latest
+    entrypoint: buildah
     args:
       - build
       - --tag
