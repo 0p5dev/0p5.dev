@@ -11,13 +11,15 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     controllerBaseUrl: "http://34.58.48.78/api/v1",
-    supabaseUrl: "",
-    supabaseApiKey: "",
     supabaseDbPassword: "",
+    public: {
+      supabaseUrl: "",
+      supabaseApiKey: "",
+    },
   },
   supabase: {
-    url: process.env.NUXT_SUPABASE_URL,
-    key: process.env.NUXT_SUPABASE_API_KEY,
+    url: process.env.NUXT_PUBLIC_SUPABASE_URL,
+    key: process.env.NUXT_PUBLIC_SUPABASE_API_KEY,
     cookiePrefix: "0p5dev",
     redirect: false,
   },

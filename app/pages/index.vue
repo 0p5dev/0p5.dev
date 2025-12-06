@@ -48,9 +48,11 @@
         </div>
       </template>
       <code class="leading-8">
-        curl -LO https://github.com/0p5dev/ops/releases/download/v0.1.1/ops
+        curl -LO
+        https://github.com/0p5dev/ops/releases/download/v0.1.2/ops_linux_amd64.tgz
         <br />
-        chmod +x ./ops &amp;&amp; sudo mv ./ops /usr/local/bin/ops
+        tar -xzf ops_linux_amd64.tgz && chmod +x ./ops_linux_amd64 && sudo mv
+        ./ops_linux_amd64 /usr/local/bin/ops
       </code>
     </UCard>
   </div>
@@ -59,10 +61,8 @@
 <script setup lang="ts">
 const textCopied = ref<boolean>(false);
 function copyCommandsToClipboard() {
-  const commands = `
-        curl -LO https://github.com/0p5dev/ops/releases/download/v0.1.1/ops
-        chmod +x ./ops && sudo mv ./ops /usr/local/bin/ops
-        `;
+  const commands = `curl -LO https://github.com/0p5dev/ops/releases/download/v0.1.2/ops.linux_amd64.tgz
+tar -xzf ops.linux_amd64.tgz && chmod +x ./ops && sudo mv ./ops /usr/local/bin/ops`;
   navigator.clipboard.writeText(commands);
   textCopied.value = true;
   setTimeout(() => {
