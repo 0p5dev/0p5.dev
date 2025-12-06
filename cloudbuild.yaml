@@ -1,6 +1,9 @@
 steps:
   - id: Build/push to AR
     name: quay.io/buildah/stable:latest
+    secretEnv:
+      - NUXT_PUBLIC_SUPABASE_API_KEY
+      - NUXT_PUBLIC_SUPABASE_URL
     entrypoint: bash
     args:
       - -c
@@ -49,3 +52,10 @@ tags:
   - development
   - webapp
   - 0p5.dev
+
+availableSecrets:
+  secretManager:
+    - versionName: projects/160851347747/secrets/ops-controller-supabase-url/versions/1
+      env: "NUXT_PUBLIC_SUPABASE_URL"
+    - versionName: projects/160851347747/secrets/ops-controller-supabase-anon-public-key/versions/1
+      env: "NUXT_PUBLIC_SUPABASE_API_KEY"
