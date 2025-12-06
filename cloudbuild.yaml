@@ -1,16 +1,28 @@
 steps:
-  - id: Build and push to Artifact Registry
-    name: gcr.io/cloud-builders/docker
-    entrypoint: "bash"
+  - id: Build container image with buildah
+    name: quay.io/buildah/stable:latest
     args:
-      - "-c"
+      - build
+      - --tag
+      - $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+      - --tag
+      - $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:latest
+      - --storage-driver=vfs
+      - --file
+      - ./Dockerfile
+      - --format
+      - docker
+      - .
       - >-
-        docker run --network=cloudbuild -v /workspace:/workspace
-        gcr.io/kaniko-project/executor:latest
-        --destination=$_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
-        --destination=$_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:latest
-        --cache=true
-        --cache-ttl=336h
+
+  - id: Push container image to Artifact Registry
+    name: quay.io/buildah/stable:latest
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        buildah --storage-driver=vfs push $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+        buildah --storage-driver=vfs push $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:latest
 
   - id: Deploy to Cloud Run
     name: "gcr.io/google.com/cloudsdktool/cloud-sdk:slim"

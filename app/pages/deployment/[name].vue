@@ -13,7 +13,19 @@
         />
       </UCard>
     </div>
-    <p v-else-if="status === 'error'">Error loading deployments: {{ error }}</p>
+    <UError
+      v-else-if="status === 'error'"
+      :error="{
+        statusCode: errorMap.statusCode,
+        statusMessage: errorMap.statusMessage,
+        message: errorMap.message,
+      }"
+      ,
+      :clear="{
+        label: 'Back to dashboard',
+      }"
+      redirect="/dashboard"
+    />
     <div v-else-if="status === 'success'" class="py-5">
       <UButton
         variant="ghost"
@@ -29,16 +41,13 @@
         orientation="horizontal"
         class="my-5"
       >
-        <!-- <div class="flex justify-between items-center"> -->
         <template #header>
-          <!-- <div class="flex justify-between items-center"> -->
           <UBadge
             :color="deployment.status === 'Ready' ? 'success' : 'error'"
             :label="deployment.status"
             class="mb-3"
           />
           <h3 class="text-3xl font-semibold">{{ deployment.name }}</h3>
-          <!-- </div> -->
         </template>
         <UCard>
           <div class="flex gap-1 items-center mb-4">
@@ -76,7 +85,6 @@
             }}</UBadge>
           </div>
         </UCard>
-        <!-- </div> -->
       </UPageCard>
       <UPageFeature
         title="URL"
@@ -132,6 +140,23 @@ const {
 } = await useLazyFetch<any>(`/api/deployments/${useRoute().params.name}`, {
   method: "GET",
   credentials: "include",
+});
+
+const errorMap = computed(() => {
+  if (error.value?.statusCode === 404) {
+    return {
+      statusCode: 404,
+      statusMessage: "Deployment Not Found",
+      message:
+        "The deployment you are looking for does not exist. Please check the name and try again.",
+    };
+  }
+  return {
+    statusCode: error.value?.statusCode || 500,
+    statusMessage: "An unknown error occurred",
+    message:
+      "Try again in a few moments, or contact support if the issue persists.",
+  };
 });
 
 import { LineChart } from "vue-chrts";

@@ -6,7 +6,7 @@
       </template>
       <template #right>
         <div class="flex items-center gap-4">
-          <UUser :name="user as string" size="xl" />
+          <UUser :name="user?.email ?? 'unknown'" size="xl" />
           <UButton size="xl" color="neutral" @click="logout" :loading="loading"
             >Logout</UButton
           >
@@ -19,18 +19,14 @@
 </template>
 
 <script setup lang="ts">
-const { user, loggedIn } = useAuth();
+const supabase = useSupabaseClient();
+const user = useSupabaseUser();
 
 const loading = ref<boolean>(false);
 async function logout() {
   loading.value = true;
   try {
-    await $fetch("/api/auth/logout", {
-      method: "POST",
-      credentials: "include",
-    });
-    loggedIn.value = false;
-    user.value = null;
+    await supabase.auth.signOut();
     await navigateTo("/login");
   } catch (err) {
     console.log("Error during logout", err);
