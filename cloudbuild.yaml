@@ -15,6 +15,10 @@ steps:
           --cache-to $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME/cache \
           .
 
+          echo "---Debugging---"
+          buildah images
+          echo "---End Debugging---"
+
   - id: Deploy to Cloud Run
     name: "gcr.io/google.com/cloudsdktool/cloud-sdk:slim"
     entrypoint: gcloud
@@ -28,10 +32,6 @@ steps:
       - "--quiet"
 
 serviceAccount: projects/local-first-476300/serviceAccounts/cloud-build-sa@local-first-476300.iam.gserviceaccount.com
-
-images:
-  - $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
-  - $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:latest
 
 options:
   substitutionOption: ALLOW_LOOSE
