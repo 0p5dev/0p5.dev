@@ -10,6 +10,8 @@ steps:
       - --storage-driver=vfs
       - --file
       - ./Dockerfile
+      - --format
+      - docker
       - .
       - >-
 
