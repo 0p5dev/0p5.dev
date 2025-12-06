@@ -14,7 +14,6 @@ steps:
       - --format
       - docker
       - .
-      - >-
 
   - id: Push container image to Artifact Registry
     name: quay.io/buildah/stable:latest
