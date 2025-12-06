@@ -15,10 +15,6 @@ steps:
           --cache-to $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME/cache \
           .
 
-          echo "---Debugging---"
-          buildah images
-          echo "---End Debugging---"
-
         buildah push \
           $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
         buildah push \
