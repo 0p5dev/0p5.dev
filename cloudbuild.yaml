@@ -14,6 +14,8 @@ steps:
           --file ./Dockerfile \
           --format docker \
           --layers \
+          --env NUXT_PUBLIC_SUPABASE_API_KEY=$$NUXT_PUBLIC_SUPABASE_API_KEY \
+          --env NUXT_PUBLIC_SUPABASE_URL=$$NUXT_PUBLIC_SUPABASE_URL \
           --cache-from $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME/cache \
           --cache-to $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME/cache \
           .
