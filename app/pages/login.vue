@@ -61,17 +61,17 @@ async function loginWithGitHub() {
 
 const providers: ButtonProps[] = [
   {
+    label: "GitHub",
+    icon: "ph:github-logo-bold",
+    size: "xl",
+    onClick: loginWithGitHub,
+  },
+  {
     label: "Google",
     icon: "ph:google-logo-bold",
     size: "xl",
 
     onClick: loginWithGoogle,
-  },
-  {
-    label: "GitHub",
-    icon: "ph:github-logo-bold",
-    size: "xl",
-    onClick: loginWithGitHub,
   },
 ];
 </script>

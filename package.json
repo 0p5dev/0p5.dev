@@ -7,7 +7,9 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "up": "docker compose up webapp",
+    "down": "docker compose down webapp --remove-orphans"
   },
   "dependencies": {
     "@nuxt/image": "^1.11.0",
@@ -22,6 +24,7 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
+    "@iconify-json/ph": "^1.2.2",
     "@nuxtjs/supabase": "^2.0.1"
   },
   "overrides": {

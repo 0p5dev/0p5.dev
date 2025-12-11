@@ -37,6 +37,7 @@
         <div class="flex justify-between items-center">
           <p class="font-semibold">CLI Quick Start</p>
           <UButton
+            v-if="status !== 'error'"
             :icon="
               textCopied ? 'ph:check-square-offset-duotone' : 'ph:copy-duotone'
             "
@@ -47,22 +48,49 @@
           />
         </div>
       </template>
-      <code class="leading-8">
+      <div v-if="status === 'pending'">
+        <USkeleton class="h-5 w-full mb-4" />
+        <USkeleton class="h-5 w-full" />
+      </div>
+      <code v-else-if="status === 'success' && release" class="leading-8">
         curl -LO
-        https://github.com/0p5dev/ops/releases/download/v0.1.2/ops_linux_amd64.tgz
+        {{ release.assets[0].browser_download_url }}
         <br />
-        tar -xzf ops_linux_amd64.tgz && chmod +x ./ops_linux_amd64 && sudo mv
-        ./ops_linux_amd64 /usr/local/bin/ops
+        tar -xzf ops_linux_amd64.tgz && sudo mv ./ops_linux_amd64
+        /usr/local/bin/ops
       </code>
+      <UAlert
+        v-else-if="status === 'error'"
+        color="error"
+        variant="subtle"
+        title="Error fetching latest release"
+        :description="error?.message || 'Refresh the page to try again.'"
+        icon="ph:link-break-bold"
+      />
     </UCard>
   </div>
 </template>
 
 <script setup lang="ts">
+const {
+  data: release,
+  status,
+  error,
+} = await useLazyFetch<any>(
+  "https://api.github.com/repos/0p5dev/ops/releases/latest",
+  {
+    headers: {
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+      Authorization: `Bearer ${useRuntimeConfig().public.githubApiToken}`,
+    },
+  }
+);
+
 const textCopied = ref<boolean>(false);
 function copyCommandsToClipboard() {
-  const commands = `curl -LO https://github.com/0p5dev/ops/releases/download/v0.1.2/ops.linux_amd64.tgz
-tar -xzf ops.linux_amd64.tgz && chmod +x ./ops && sudo mv ./ops /usr/local/bin/ops`;
+  const commands = `curl -LO ${release.value.assets[0].browser_download_url}
+tar -xzf ops_linux_amd64.tgz && sudo mv ./ops_linux_amd64 /usr/local/bin/ops`;
   navigator.clipboard.writeText(commands);
   textCopied.value = true;
   setTimeout(() => {

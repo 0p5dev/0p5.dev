@@ -1,14 +1,14 @@
-FROM node:24-alpine AS build
+FROM oven/bun:1.3-alpine AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN bun install
 COPY . .
-RUN npm run build
+RUN bun run build
 
-FROM node:24-alpine AS production
+FROM oven/bun:1.3-alpine AS production
 WORKDIR /app
 COPY --from=build /app/.output .output
 ENV NODE_ENV=production
 EXPOSE 3000
-ENTRYPOINT [ "node" ]
+ENTRYPOINT [ "bun" ]
 CMD [ ".output/server/index.mjs" ]
