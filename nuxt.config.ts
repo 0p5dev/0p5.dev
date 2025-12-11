@@ -32,7 +32,4 @@ export default defineNuxtConfig({
       callback: "/dashboard",
     },
   },
-  nitro: {
-    preset: "bun",
-  },
 });
