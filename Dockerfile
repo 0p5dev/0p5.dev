@@ -1,14 +1,14 @@
-FROM docker.io/oven/bun:1.3-alpine AS build
+FROM docker.io/library/node:24-alpine AS build
 WORKDIR /app
 COPY package*.json ./
-RUN bun install
+RUN npm install
 COPY . .
-RUN bun run build
+RUN npm run build
 
-FROM docker.io/oven/bun:1.3-alpine AS production
+FROM docker.io/library/node:24-alpine AS production
 WORKDIR /app
 COPY --from=build /app/.output .output
 ENV NODE_ENV=production
 EXPOSE 3000
-ENTRYPOINT [ "bun" ]
+ENTRYPOINT [ "node" ]
 CMD [ ".output/server/index.mjs" ]

@@ -7,7 +7,7 @@ A modern, full-stack web application built with Nuxt 4, Vue 3, and Supabase. Thi
 ## 🚀 Tech Stack
 
 - **Framework:** [Nuxt 4](https://nuxt.com/) with Server-Side Rendering (SSR)
-- **Runtime:** [Bun](https://bun.sh/) (high-performance JavaScript runtime)
+- **Runtime:** [Node.js](https://nodejs.org/) (JavaScript runtime)
 - **Frontend:** Vue 3 with TypeScript
 - **UI Library:** [@nuxt/ui](https://ui.nuxt.com/) (Tailwind CSS-based component library)
 - **Authentication:** Supabase Auth (OAuth with GitHub & Google)
@@ -20,7 +20,8 @@ A modern, full-stack web application built with Nuxt 4, Vue 3, and Supabase. Thi
 
 ## 📋 Prerequisites
 
-- [Bun](https://bun.sh/) >= 1.0.0
+- [Node.js](https://nodejs.org/) >= 18.0.0
+- [npm](https://www.npmjs.com/) (comes with Node.js)
 - [Docker](https://www.docker.com/) (for containerized deployment)
 - [Git](https://git-scm.com/)
 - [Supabase](https://supabase.com/) project (for authentication)
@@ -37,7 +38,7 @@ cd lfcloud
 ### 2. Install dependencies
 
 ```bash
-bun install
+npm install
 ```
 
 ### 3. Environment Configuration
@@ -60,7 +61,7 @@ NUXT_CONTROLLER_BASE_URL=http://your-backend-api/api/v1
 ### 4. Generate TypeScript types from Supabase
 
 ```bash
-bunx supabase gen types typescript --project-id your-project-id > app/types/database.types.ts
+npx supabase gen types typescript --project-id your-project-id > app/types/database.types.ts
 ```
 
 ## 🏃 Development
@@ -68,11 +69,11 @@ bunx supabase gen types typescript --project-id your-project-id > app/types/data
 Start the development server using Docker Compose:
 
 ```bash
-bun run up
+npm run up
 ```
 
 This command starts the application in a Docker container with:
-- **Bun runtime** for fast dependency installation and hot reloading
+- **Node.js runtime** for dependency installation and hot reloading
 - **Volume mounting** for live code changes without rebuilding
 - **Port 3000 exposed** to your host machine
 - **Environment variables** loaded from `.env` file
@@ -82,7 +83,7 @@ The application will be available at [http://localhost:3000](http://localhost:30
 To stop the development server:
 
 ```bash
-bun run down
+npm run down
 ```
 
 ### Development Features
@@ -97,13 +98,13 @@ bun run down
 ### Local Build
 
 ```bash
-bun run build
+npm run build
 ```
 
 Preview the production build:
 
 ```bash
-bun run preview
+npm run preview
 ```
 
 ### Docker Build
@@ -221,13 +222,13 @@ Custom color scheme:
 
 | Command | Description |
 |---------|-------------|
-| `bun run up` | Start development server in Docker container |
-| `bun run down` | Stop and remove Docker containers |
-| `bun run dev` | Start local development server (without Docker) |
-| `bun run build` | Build for production |
-| `bun run generate` | Generate static site |
-| `bun run preview` | Preview production build |
-| `bun install` | Install dependencies |
+| `npm run up` | Start development server in Docker container |
+| `npm run down` | Stop and remove Docker containers |
+| `npm run dev` | Start local development server (without Docker) |
+| `npm run build` | Build for production |
+| `npm run generate` | Generate static site |
+| `npm run preview` | Preview production build |
+| `npm install` | Install dependencies |
 
 ## 🐛 Debugging
 

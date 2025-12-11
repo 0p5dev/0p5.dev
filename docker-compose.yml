@@ -1,7 +1,7 @@
 name: 0p5.dev
 services:
   webapp:
-    image: oven/bun:1.3-alpine
+    image: node:24-alpine
     container_name: 0p5.dev
     volumes:
       - ./:/app
@@ -10,7 +10,7 @@ services:
       - "3000:3000"
     tty: true
     entrypoint: ["sh", "-c"]
-    command: ["bun install && bun run dev"]
+    command: ["npm install && npm run dev"]
     env_file:
       - .env
     user: "${UID-1000}:${GID-1000}"
