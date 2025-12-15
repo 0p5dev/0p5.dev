@@ -26,7 +26,7 @@
       }"
       redirect="/dashboard"
     />
-    <div v-else-if="status === 'success'" class="py-5">
+    <div v-else-if="status === 'success' && deployment" class="py-5">
       <UButton
         variant="ghost"
         color="neutral"
@@ -81,7 +81,19 @@
         </UCard>
       </UPageCard>
       <div class="flex gap-7 mb-5">
-        <UPageCard variant="subtle" title="Incurred Charges" class="flex-1">
+        <UPageCard
+          variant="subtle"
+          class="flex-1"
+          :ui="{
+            wrapper: 'items-stretch',
+          }"
+        >
+          <template #title>
+            <div class="flex items-center justify-between mb-1">
+              <div>Incurred Charges</div>
+              <UButton label="Billing Info" />
+            </div>
+          </template>
           <div class="flex gap-4">
             <UPageCard class="flex-1">
               <p class="-mb-2">Lifetime</p>
@@ -97,27 +109,12 @@
             </UPageCard>
           </div>
         </UPageCard>
-        <UPageCard variant="subtle" class="flex-1">
-          <template #title>
-            Scaling<span class="font-normal text-muted">
-              (container instances)</span
-            >
-          </template>
-          <div class="flex gap-4">
-            <UPageCard class="flex-1">
-              <p class="-mb-2">Min</p>
-              <p class="text-3xl font-semibold">0</p>
-            </UPageCard>
-            <UPageCard class="flex-1">
-              <p class="text-nowrap -mb-2">Max</p>
-              <p class="text-3xl font-semibold">1</p>
-            </UPageCard>
-            <UPageCard class="flex-1">
-              <p class="-mb-2">Current</p>
-              <p class="text-3xl font-semibold">1</p>
-            </UPageCard>
-          </div>
-        </UPageCard>
+        <DashboardScaling
+          v-if="deployment"
+          :min-instances="deployment.scaling.min_instances"
+          :max-instances="deployment.scaling.max_instances"
+          @update:scaling="updateDeployment"
+        />
       </div>
       <UPageFeature
         title="URL"
@@ -130,7 +127,7 @@
         title="Container Image"
         :description="deployment.image"
         icon="ph:cube-duotone"
-        class="mt-5 mb-10"
+        class="mt-5 mb-7"
       />
 
       <client-only>
@@ -155,23 +152,80 @@
           </UPageCard>
         </div>
       </client-only>
+
+      <div
+        class="flex gap-7 my-7 items-center border border-neutral-800 p-5 rounded-lg"
+      >
+        <UButton color="error" label="Terminate Deployment" />
+        <USeparator orientation="vertical" class="h-12" />
+        <p>
+          Permanently decommission this deployment and immediately stop
+          accepting incoming traffic.
+        </p>
+      </div>
     </div>
+    <UModal
+      v-model:open="updateLoading"
+      title="Updating Deployment"
+      description="Loading indicator for deployment updates"
+    >
+      <template #content>
+        <UCard variant="subtle" class="text-center">
+          <p>Updating deployment</p>
+          <UIcon
+            name="svg-spinners:blocks-shuffle-3"
+            size="35"
+            class="mx-auto mt-5"
+          />
+        </UCard>
+      </template>
+    </UModal>
   </UContainer>
 </template>
 
 <script setup lang="ts">
+import { LineChart } from "vue-chrts";
+
 definePageMeta({
   layout: "dashboard",
 });
+
+const toast = useToast();
+
+interface CloudRunServiceDetails {
+  name: string;
+  url: string;
+  image: string;
+  status: string;
+  location: string;
+  created_time: string;
+  updated_time: string;
+  scaling: {
+    min_instances: number;
+    max_instances: number;
+  };
+  metrics: any;
+}
+
+interface UpdateDeploymentPayload {
+  name: string;
+  container_image: string;
+  min_instances: number;
+  max_instances: number;
+}
 
 const {
   data: deployment,
   status,
   error,
-} = await useLazyFetch<any>(`/api/deployments/${useRoute().params.name}`, {
-  method: "GET",
-  credentials: "include",
-});
+  refresh,
+} = await useLazyFetch<CloudRunServiceDetails>(
+  `/api/deployments/${useRoute().params.name}`,
+  {
+    method: "GET",
+    credentials: "include",
+  }
+);
 
 const errorMap = computed(() => {
   if (error.value?.statusCode === 404) {
@@ -190,7 +244,29 @@ const errorMap = computed(() => {
   };
 });
 
-import { LineChart } from "vue-chrts";
+const updateLoading = ref<boolean>(false);
+const updateDeployment = async (payload: Partial<UpdateDeploymentPayload>) => {
+  updateLoading.value = true;
+  let body: UpdateDeploymentPayload = {
+    name: deployment.value!.name,
+    container_image: deployment.value!.image,
+    min_instances: deployment.value!.scaling.min_instances,
+    max_instances: deployment.value!.scaling.max_instances,
+  };
+  body = { ...body, ...payload };
+  try {
+    await $fetch<any>(`/api/deployments`, {
+      method: "PUT",
+      credentials: "include",
+      body,
+    });
+    await refresh();
+  } catch (err: any) {
+    console.error(err);
+    toast.add({ title: "Error", description: err.message, color: "error" });
+  }
+  updateLoading.value = false;
+};
 
 const requestsCategories = {
   requests: {

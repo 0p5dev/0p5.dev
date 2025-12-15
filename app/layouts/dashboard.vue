@@ -7,9 +7,13 @@
       <template #right>
         <div class="flex items-center gap-4">
           <UUser :name="user?.email ?? 'unknown'" size="xl" />
-          <UButton size="xl" color="neutral" @click="logout" :loading="loading"
-            >Logout</UButton
-          >
+          <UButton
+            color="neutral"
+            @click="logout"
+            :loading="loading"
+            label="Logout"
+            leading-icon="ph:sign-out"
+          />
         </div>
       </template>
     </UHeader>

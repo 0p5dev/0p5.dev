@@ -5,5 +5,10 @@ export default defineAppConfig({
       secondary: "teal",
       neutral: "zinc",
     },
+    inputNumber: {
+      defaultVariants: {
+        size: "xl",
+      },
+    },
   },
 });
