@@ -39,7 +39,7 @@
         variant="subtle"
         :ui="{ body: 'sm:p-4' }"
         orientation="horizontal"
-        class="my-5"
+        class="mt-5 mb-7"
       >
         <template #header>
           <UBadge
@@ -53,39 +53,72 @@
           <div class="flex gap-1 items-center mb-4">
             <p>First deployed</p>
             <UIcon name="ph:dot-duotone" />
-            <p>
-              {{
-                new Date(deployment.created_time).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })
-              }}
-            </p>
+            <NuxtTime :datetime="new Date(deployment.created_time)" />
             <UIcon name="ph:dot-duotone" />
-            <UBadge color="neutral" variant="soft">{{
-              useTimeAgo(deployment.created_time)
-            }}</UBadge>
+            <UBadge color="neutral" variant="soft">
+              <NuxtTime
+                :datetime="new Date(deployment.created_time)"
+                relative
+                numeric="auto"
+                relative-style="long"
+              />
+            </UBadge>
           </div>
           <div class="flex gap-1 items-center">
             <p>Last deployed</p>
             <UIcon name="ph:dot-duotone" />
-            <p>
-              {{
-                new Date(deployment.updated_time).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })
-              }}
-            </p>
+            <NuxtTime :datetime="new Date(deployment.updated_time)" />
             <UIcon name="ph:dot-duotone" />
-            <UBadge color="neutral" variant="soft">{{
-              useTimeAgo(deployment.updated_time)
-            }}</UBadge>
+            <UBadge color="neutral" variant="soft">
+              <NuxtTime
+                :datetime="new Date(deployment.updated_time)"
+                relative
+                numeric="auto"
+                relative-style="long"
+              />
+            </UBadge>
           </div>
         </UCard>
       </UPageCard>
+      <div class="flex gap-7 mb-5">
+        <UPageCard variant="subtle" title="Incurred Charges" class="flex-1">
+          <div class="flex gap-4">
+            <UPageCard class="flex-1">
+              <p class="-mb-2">Lifetime</p>
+              <p class="text-3xl font-semibold">$75.49</p>
+            </UPageCard>
+            <UPageCard class="flex-1">
+              <p class="text-nowrap -mb-2">This Month</p>
+              <p class="text-3xl font-semibold">$43.01</p>
+            </UPageCard>
+            <UPageCard class="flex-1">
+              <p class="-mb-2">Today</p>
+              <p class="text-3xl font-semibold">$10.47</p>
+            </UPageCard>
+          </div>
+        </UPageCard>
+        <UPageCard variant="subtle" class="flex-1">
+          <template #title>
+            Scaling<span class="font-normal text-muted">
+              (container instances)</span
+            >
+          </template>
+          <div class="flex gap-4">
+            <UPageCard class="flex-1">
+              <p class="-mb-2">Min</p>
+              <p class="text-3xl font-semibold">0</p>
+            </UPageCard>
+            <UPageCard class="flex-1">
+              <p class="text-nowrap -mb-2">Max</p>
+              <p class="text-3xl font-semibold">1</p>
+            </UPageCard>
+            <UPageCard class="flex-1">
+              <p class="-mb-2">Current</p>
+              <p class="text-3xl font-semibold">1</p>
+            </UPageCard>
+          </div>
+        </UPageCard>
+      </div>
       <UPageFeature
         title="URL"
         :description="deployment.url"
@@ -127,8 +160,6 @@
 </template>
 
 <script setup lang="ts">
-import { useTimeAgo } from "@vueuse/core";
-
 definePageMeta({
   layout: "dashboard",
 });

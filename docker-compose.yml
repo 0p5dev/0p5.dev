@@ -1,4 +1,8 @@
 name: 0p5.dev
+networks:
+  0p5dev:
+    driver: bridge
+    name: 0p5dev
 services:
   webapp:
     image: node:24-alpine
@@ -11,6 +15,8 @@ services:
     tty: true
     entrypoint: ["sh", "-c"]
     command: ["npm install && npm run dev"]
+    networks:
+      - 0p5dev
     env_file:
       - .env
     user: "${UID-1000}:${GID-1000}"
