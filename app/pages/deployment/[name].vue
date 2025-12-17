@@ -109,7 +109,7 @@
             </UPageCard>
           </div>
         </UPageCard>
-        <DashboardScaling
+        <DeploymentScaling
           v-if="deployment"
           :min-instances="deployment.scaling.min_instances"
           :max-instances="deployment.scaling.max_instances"
@@ -130,33 +130,16 @@
         class="mt-5 mb-7"
       />
 
-      <client-only>
-        <div class="flex gap-8">
-          <UPageCard variant="subtle" class="flex-1">
-            <LineChart
-              :data="requestsData"
-              :categories="requestsCategories"
-              :height="300"
-              :xFormatter="requestsXFormatter"
-              yLabel="Requests"
-            />
-          </UPageCard>
-          <UPageCard variant="subtle" class="flex-1">
-            <LineChart
-              :data="cpuData"
-              :categories="cpuCategories"
-              :height="300"
-              :xFormatter="cpuXFormatter"
-              yLabel="CPU Usage"
-            />
-          </UPageCard>
-        </div>
-      </client-only>
+      <DeploymentMetrics :metrics="deployment.metrics" />
 
       <div
         class="flex gap-7 my-7 items-center border border-neutral-800 p-5 rounded-lg"
       >
-        <UButton color="error" label="Terminate Deployment" />
+        <UButton
+          color="error"
+          label="Terminate Deployment"
+          @click="showTerminateModal = true"
+        />
         <USeparator orientation="vertical" class="h-12" />
         <p>
           Permanently decommission this deployment and immediately stop
@@ -164,27 +147,17 @@
         </p>
       </div>
     </div>
-    <UModal
-      v-model:open="updateLoading"
-      title="Updating Deployment"
-      description="Loading indicator for deployment updates"
-    >
-      <template #content>
-        <UCard variant="subtle" class="text-center">
-          <p>Updating deployment</p>
-          <UIcon
-            name="svg-spinners:blocks-shuffle-3"
-            size="35"
-            class="mx-auto mt-5"
-          />
-        </UCard>
-      </template>
-    </UModal>
+    <TerminateModal
+      v-model="showTerminateModal"
+      :loading="terminationLoading"
+      @terminate="terminateDeployment"
+    />
+    <DeploymentUpdateLoadingModal v-model="updateLoading" />
   </UContainer>
 </template>
 
 <script setup lang="ts">
-import { LineChart } from "vue-chrts";
+import TerminateModal from "~/components/deployment/TerminateModal.vue";
 
 definePageMeta({
   layout: "dashboard",
@@ -268,53 +241,28 @@ const updateDeployment = async (payload: Partial<UpdateDeploymentPayload>) => {
   updateLoading.value = false;
 };
 
-const requestsCategories = {
-  requests: {
-    name: "Requests",
-    color: "#3b82f6",
-  },
-};
-
-const cpuCategories = {
-  cpu: {
-    name: "CPU Usage",
-    color: "#f97316",
-  },
-};
-
-const requestsData = computed(() => {
-  if (!deployment.value?.metrics?.requests_per_hour) {
-    return [];
+const showTerminateModal = ref<boolean>(false);
+const terminationLoading = ref<boolean>(false);
+const terminateDeployment = async () => {
+  terminationLoading.value = true;
+  try {
+    await $fetch<any>(`/api/deployments/${deployment.value!.name}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    showTerminateModal.value = false;
+    toast.add({
+      title: "Deployment Terminated",
+      description: `The deployment ${
+        deployment.value!.name
+      } has been terminated.`,
+      color: "success",
+    });
+    navigateTo("/dashboard");
+  } catch (err: any) {
+    console.error(err);
+    toast.add({ title: "Error", description: err.message, color: "error" });
   }
-
-  return deployment.value.metrics.requests_per_hour.map(
-    (value: number, index: number) => ({
-      requests: value,
-      x: index,
-    })
-  );
-});
-
-const requestsXFormatter = (i: number) => {
-  const totalHours = requestsData.value.length - 1;
-  return `${totalHours - requestsData.value[i].x} hours ago`;
-};
-
-const cpuData = computed(() => {
-  if (!deployment.value?.metrics?.cpu_per_hour) {
-    return [];
-  }
-
-  return deployment.value.metrics.cpu_per_hour.map(
-    (value: number, index: number) => ({
-      requests: value,
-      x: index,
-    })
-  );
-});
-
-const cpuXFormatter = (i: number) => {
-  const totalHours = cpuData.value.length - 1;
-  return `${totalHours - cpuData.value[i].x} hours ago`;
+  terminationLoading.value = false;
 };
 </script>
