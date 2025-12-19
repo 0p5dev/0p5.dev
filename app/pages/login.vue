@@ -23,7 +23,7 @@ const toast = useToast();
 const supabase = useSupabaseClient();
 
 async function loginWithGoogle() {
-  const { data, error } = await supabase.auth.signInWithOAuth({
+  const { error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
       redirectTo: "/dashboard",
@@ -40,8 +40,7 @@ async function loginWithGoogle() {
 }
 
 async function loginWithGitHub() {
-  // console.log("Logging in with GitHub");
-  const { data, error } = await supabase.auth.signInWithOAuth({
+  const { error } = await supabase.auth.signInWithOAuth({
     provider: "github",
     options: {
       redirectTo: "/dashboard",
@@ -56,7 +55,6 @@ async function loginWithGitHub() {
       description: "You will be redirected to GitHub for authentication.",
     });
   }
-  // console.log("GitHub login data:", data);
 }
 
 const providers: ButtonProps[] = [

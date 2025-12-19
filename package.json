@@ -24,7 +24,9 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
+    "@iconify-json/lucide": "^1.2.81",
     "@iconify-json/ph": "^1.2.2",
+    "@iconify-json/svg-spinners": "^1.2.4",
     "@nuxtjs/supabase": "^2.0.1"
   },
   "overrides": {

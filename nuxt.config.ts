@@ -27,9 +27,5 @@ export default defineNuxtConfig({
     key: process.env.NUXT_PUBLIC_SUPABASE_API_KEY,
     cookiePrefix: "0p5dev",
     redirect: false,
-    redirectOptions: {
-      login: "/login",
-      callback: "/dashboard",
-    },
   },
 });

@@ -26,7 +26,7 @@
       }"
       redirect="/dashboard"
     />
-    <div v-else-if="status === 'success'" class="py-5">
+    <div v-else-if="status === 'success' && deployment" class="py-5">
       <UButton
         variant="ghost"
         color="neutral"
@@ -39,7 +39,7 @@
         variant="subtle"
         :ui="{ body: 'sm:p-4' }"
         orientation="horizontal"
-        class="my-5"
+        class="mt-5 mb-7"
       >
         <template #header>
           <UBadge
@@ -53,39 +53,69 @@
           <div class="flex gap-1 items-center mb-4">
             <p>First deployed</p>
             <UIcon name="ph:dot-duotone" />
-            <p>
-              {{
-                new Date(deployment.created_time).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })
-              }}
-            </p>
+            <NuxtTime :datetime="new Date(deployment.created_time)" />
             <UIcon name="ph:dot-duotone" />
-            <UBadge color="neutral" variant="soft">{{
-              useTimeAgo(deployment.created_time)
-            }}</UBadge>
+            <UBadge color="neutral" variant="soft">
+              <NuxtTime
+                :datetime="new Date(deployment.created_time)"
+                relative
+                numeric="auto"
+                relative-style="long"
+              />
+            </UBadge>
           </div>
           <div class="flex gap-1 items-center">
             <p>Last deployed</p>
             <UIcon name="ph:dot-duotone" />
-            <p>
-              {{
-                new Date(deployment.updated_time).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })
-              }}
-            </p>
+            <NuxtTime :datetime="new Date(deployment.updated_time)" />
             <UIcon name="ph:dot-duotone" />
-            <UBadge color="neutral" variant="soft">{{
-              useTimeAgo(deployment.updated_time)
-            }}</UBadge>
+            <UBadge color="neutral" variant="soft">
+              <NuxtTime
+                :datetime="new Date(deployment.updated_time)"
+                relative
+                numeric="auto"
+                relative-style="long"
+              />
+            </UBadge>
           </div>
         </UCard>
       </UPageCard>
+      <div class="flex gap-7 mb-5">
+        <UPageCard
+          variant="subtle"
+          class="flex-1"
+          :ui="{
+            wrapper: 'items-stretch',
+          }"
+        >
+          <template #title>
+            <div class="flex items-center justify-between mb-1">
+              <div>Incurred Charges</div>
+              <UButton label="Billing Info" />
+            </div>
+          </template>
+          <div class="flex gap-4">
+            <UPageCard class="flex-1">
+              <p class="-mb-2">Lifetime</p>
+              <p class="text-3xl font-semibold">$75.49</p>
+            </UPageCard>
+            <UPageCard class="flex-1">
+              <p class="text-nowrap -mb-2">This Month</p>
+              <p class="text-3xl font-semibold">$43.01</p>
+            </UPageCard>
+            <UPageCard class="flex-1">
+              <p class="-mb-2">Today</p>
+              <p class="text-3xl font-semibold">$10.47</p>
+            </UPageCard>
+          </div>
+        </UPageCard>
+        <DeploymentScaling
+          v-if="deployment"
+          :min-instances="deployment.scaling.min_instances"
+          :max-instances="deployment.scaling.max_instances"
+          @update:scaling="updateDeployment"
+        />
+      </div>
       <UPageFeature
         title="URL"
         :description="deployment.url"
@@ -97,50 +127,78 @@
         title="Container Image"
         :description="deployment.image"
         icon="ph:cube-duotone"
-        class="mt-5 mb-10"
+        class="mt-5 mb-7"
       />
 
-      <client-only>
-        <div class="flex gap-8">
-          <UPageCard variant="subtle" class="flex-1">
-            <LineChart
-              :data="requestsData"
-              :categories="requestsCategories"
-              :height="300"
-              :xFormatter="requestsXFormatter"
-              yLabel="Requests"
-            />
-          </UPageCard>
-          <UPageCard variant="subtle" class="flex-1">
-            <LineChart
-              :data="cpuData"
-              :categories="cpuCategories"
-              :height="300"
-              :xFormatter="cpuXFormatter"
-              yLabel="CPU Usage"
-            />
-          </UPageCard>
-        </div>
-      </client-only>
+      <DeploymentMetrics :metrics="deployment.metrics" />
+
+      <div
+        class="flex gap-7 my-7 items-center border border-neutral-800 p-5 rounded-lg"
+      >
+        <UButton
+          color="error"
+          label="Terminate Deployment"
+          @click="showTerminateModal = true"
+        />
+        <USeparator orientation="vertical" class="h-12" />
+        <p>
+          Permanently decommission this deployment and immediately stop
+          accepting incoming traffic.
+        </p>
+      </div>
     </div>
+    <TerminateModal
+      v-model="showTerminateModal"
+      :loading="terminationLoading"
+      @terminate="terminateDeployment"
+    />
+    <DeploymentUpdateLoadingModal v-model="updateLoading" />
   </UContainer>
 </template>
 
 <script setup lang="ts">
-import { useTimeAgo } from "@vueuse/core";
+import TerminateModal from "~/components/deployment/TerminateModal.vue";
 
 definePageMeta({
   layout: "dashboard",
 });
 
+const toast = useToast();
+
+interface CloudRunServiceDetails {
+  name: string;
+  url: string;
+  image: string;
+  status: string;
+  location: string;
+  created_time: string;
+  updated_time: string;
+  scaling: {
+    min_instances: number;
+    max_instances: number;
+  };
+  metrics: any;
+}
+
+interface UpdateDeploymentPayload {
+  name: string;
+  container_image: string;
+  min_instances: number;
+  max_instances: number;
+}
+
 const {
   data: deployment,
   status,
   error,
-} = await useLazyFetch<any>(`/api/deployments/${useRoute().params.name}`, {
-  method: "GET",
-  credentials: "include",
-});
+  refresh,
+} = await useLazyFetch<CloudRunServiceDetails>(
+  `/api/deployments/${useRoute().params.name}`,
+  {
+    method: "GET",
+    credentials: "include",
+  }
+);
 
 const errorMap = computed(() => {
   if (error.value?.statusCode === 404) {
@@ -159,55 +217,52 @@ const errorMap = computed(() => {
   };
 });
 
-import { LineChart } from "vue-chrts";
-
-const requestsCategories = {
-  requests: {
-    name: "Requests",
-    color: "#3b82f6",
-  },
-};
-
-const cpuCategories = {
-  cpu: {
-    name: "CPU Usage",
-    color: "#f97316",
-  },
-};
-
-const requestsData = computed(() => {
-  if (!deployment.value?.metrics?.requests_per_hour) {
-    return [];
+const updateLoading = ref<boolean>(false);
+const updateDeployment = async (payload: Partial<UpdateDeploymentPayload>) => {
+  updateLoading.value = true;
+  let body: UpdateDeploymentPayload = {
+    name: deployment.value!.name,
+    container_image: deployment.value!.image,
+    min_instances: deployment.value!.scaling.min_instances,
+    max_instances: deployment.value!.scaling.max_instances,
+  };
+  body = { ...body, ...payload };
+  try {
+    await $fetch<any>(`/api/deployments`, {
+      method: "PUT",
+      credentials: "include",
+      body,
+    });
+    await refresh();
+  } catch (err: any) {
+    console.error(err);
+    toast.add({ title: "Error", description: err.message, color: "error" });
   }
-
-  return deployment.value.metrics.requests_per_hour.map(
-    (value: number, index: number) => ({
-      requests: value,
-      x: index,
-    })
-  );
-});
-
-const requestsXFormatter = (i: number) => {
-  const totalHours = requestsData.value.length - 1;
-  return `${totalHours - requestsData.value[i].x} hours ago`;
+  updateLoading.value = false;
 };
 
-const cpuData = computed(() => {
-  if (!deployment.value?.metrics?.cpu_per_hour) {
-    return [];
+const showTerminateModal = ref<boolean>(false);
+const terminationLoading = ref<boolean>(false);
+const terminateDeployment = async () => {
+  terminationLoading.value = true;
+  try {
+    await $fetch<any>(`/api/deployments/${deployment.value!.name}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    showTerminateModal.value = false;
+    toast.add({
+      title: "Deployment Terminated",
+      description: `The deployment ${
+        deployment.value!.name
+      } has been terminated.`,
+      color: "success",
+    });
+    navigateTo("/dashboard");
+  } catch (err: any) {
+    console.error(err);
+    toast.add({ title: "Error", description: err.message, color: "error" });
   }
-
-  return deployment.value.metrics.cpu_per_hour.map(
-    (value: number, index: number) => ({
-      requests: value,
-      x: index,
-    })
-  );
-});
-
-const cpuXFormatter = (i: number) => {
-  const totalHours = cpuData.value.length - 1;
-  return `${totalHours - cpuData.value[i].x} hours ago`;
+  terminationLoading.value = false;
 };
 </script>

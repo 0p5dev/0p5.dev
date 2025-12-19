@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
   }
   // console.log("Access token:", accessToken);
   let body = null;
-  if (isMethod(event, "POST")) {
+  if (isMethod(event, "POST") || isMethod(event, "PUT")) {
     body = await readBody(event);
   }
 
