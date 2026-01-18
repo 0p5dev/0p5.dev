@@ -2,7 +2,13 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: ["@nuxt/ui", "@nuxt/image", "nuxt-charts", "@nuxtjs/supabase"],
+  modules: [
+    "@nuxt/ui",
+    "@nuxt/image",
+    "nuxt-charts",
+    "@nuxtjs/supabase",
+    "@vueuse/nuxt",
+  ],
   css: ["~/assets/css/main.css"],
   ssr: true,
   devServer: {

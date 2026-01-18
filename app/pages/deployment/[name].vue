@@ -37,7 +37,9 @@
       />
       <UPageCard
         variant="subtle"
-        :ui="{ body: 'sm:p-4' }"
+        :ui="{
+          body: 'sm:p-4',
+        }"
         orientation="horizontal"
         class="mt-5 mb-7"
       >
@@ -50,11 +52,11 @@
           <h3 class="text-3xl font-semibold">{{ deployment.name }}</h3>
         </template>
         <UCard>
-          <div class="flex gap-1 items-center mb-4">
-            <p>First deployed</p>
-            <UIcon name="ph:dot-duotone" />
+          <div class="flex flex-col sm:flex-row gap-1 items-center mb-4">
+            <p class="font-bold sm:font-normal">First deployed</p>
+            <UIcon name="ph:dot-duotone" class="hidden sm:block" />
             <NuxtTime :datetime="new Date(deployment.created_time)" />
-            <UIcon name="ph:dot-duotone" />
+            <UIcon name="ph:dot-duotone" class="hidden sm:block" />
             <UBadge color="neutral" variant="soft">
               <NuxtTime
                 :datetime="new Date(deployment.created_time)"
@@ -64,11 +66,12 @@
               />
             </UBadge>
           </div>
-          <div class="flex gap-1 items-center">
-            <p>Last deployed</p>
-            <UIcon name="ph:dot-duotone" />
+          <USeparator class="block sm:hidden mb-2" />
+          <div class="flex flex-col sm:flex-row gap-1 items-center">
+            <p class="font-bold sm:font-normal">Last deployed</p>
+            <UIcon name="ph:dot-duotone" class="hidden sm:block" />
             <NuxtTime :datetime="new Date(deployment.updated_time)" />
-            <UIcon name="ph:dot-duotone" />
+            <UIcon name="ph:dot-duotone" class="hidden sm:block" />
             <UBadge color="neutral" variant="soft">
               <NuxtTime
                 :datetime="new Date(deployment.updated_time)"
@@ -80,7 +83,7 @@
           </div>
         </UCard>
       </UPageCard>
-      <div class="flex gap-7 mb-5">
+      <div class="flex flex-col sm:flex-row flex-wrap gap-7 mb-5">
         <UPageCard
           variant="subtle"
           class="flex-1"
@@ -94,7 +97,7 @@
               <UButton label="Billing Info" />
             </div>
           </template>
-          <div class="flex gap-4">
+          <div class="flex flex-col sm:flex-row gap-4">
             <UPageCard class="flex-1">
               <p class="-mb-2">Lifetime</p>
               <p class="text-3xl font-semibold">$75.49</p>
@@ -122,6 +125,7 @@
         icon="ph:share-duotone"
         :to="deployment.url"
         target="_blank"
+        class="max-w-max"
       />
       <UPageFeature
         title="Container Image"
@@ -130,24 +134,24 @@
         class="mt-5 mb-7"
       />
 
-      <DeploymentMetrics :metrics="deployment.metrics" />
+      <!-- <DeploymentMetrics :metrics="deployment.metrics" /> -->
 
       <div
-        class="flex gap-7 my-7 items-center border border-neutral-800 p-5 rounded-lg"
+        class="flex flex-col sm:flex-row gap-3 sm:gap-7 my-7 items-start sm:items-center border border-neutral-800 p-5 rounded-lg"
       >
         <UButton
           color="error"
           label="Terminate Deployment"
           @click="showTerminateModal = true"
         />
-        <USeparator orientation="vertical" class="h-12" />
+        <USeparator orientation="vertical" class="h-12 hidden sm:block" />
         <p>
           Permanently decommission this deployment and immediately stop
           accepting incoming traffic.
         </p>
       </div>
     </div>
-    <TerminateModal
+    <DeploymentTerminateModal
       v-model="showTerminateModal"
       :loading="terminationLoading"
       @terminate="terminateDeployment"
@@ -157,8 +161,6 @@
 </template>
 
 <script setup lang="ts">
-import TerminateModal from "~/components/deployment/TerminateModal.vue";
-
 definePageMeta({
   layout: "dashboard",
 });
@@ -197,7 +199,7 @@ const {
   {
     method: "GET",
     credentials: "include",
-  }
+  },
 );
 
 const errorMap = computed(() => {
