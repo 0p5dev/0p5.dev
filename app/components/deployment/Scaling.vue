@@ -9,7 +9,9 @@
     <template #title>
       <div class="flex items-center justify-between mb-1">
         <div>
-          Scaling<span class="font-normal text-muted">
+          Scaling<span
+            class="font-normal text-muted text-nowrap text-sm sm:text-base"
+          >
             (container instances)</span
           >
         </div>
@@ -18,7 +20,7 @@
           label="Edit Scaling"
           @click="isEditing = true"
         />
-        <div v-else class="flex gap-2">
+        <div v-else-if="isEditing && windowWidth > 640" class="flex gap-2">
           <UButton label="Cancel" variant="ghost" @click="isEditing = false" />
           <UButton
             label="Save Changes"
@@ -53,10 +55,21 @@
         <p v-else class="text-3xl font-semibold">{{ max_instances }}</p>
       </UPageCard>
     </div>
+    <div v-if="isEditing && windowWidth <= 640" class="flex justify-end gap-2">
+      <UButton label="Cancel" variant="ghost" @click="isEditing = false" />
+      <UButton
+        label="Save Changes"
+        color="primary"
+        @click="emit('update:scaling', { min_instances, max_instances })"
+        :disabled="disabled"
+      />
+    </div>
   </UPageCard>
 </template>
 
 <script setup lang="ts">
+const { width: windowWidth } = useWindowSize();
+
 const props = defineProps<{
   minInstances: number;
   maxInstances: number;
@@ -85,13 +98,13 @@ watch(
       min_instances.value = newMin;
       max_instances.value = newMax;
     }
-  }
+  },
 );
 const invalid = computed<boolean>(
-  () => min_instances.value > max_instances.value
+  () => min_instances.value > max_instances.value,
 );
 const disabled = computed<boolean>(
-  () => invalid.value || min_instances.value < 0 || max_instances.value < 1
+  () => invalid.value || min_instances.value < 0 || max_instances.value < 1,
 );
 const emit = defineEmits(["update:scaling"]);
 </script>

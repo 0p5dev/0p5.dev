@@ -6,12 +6,15 @@
       </template>
       <template #right>
         <div class="flex items-center gap-4">
-          <UUser :name="user?.email ?? 'unknown'" size="xl" />
+          <UUser
+            :name="user?.email ?? 'unknown'"
+            :size="windowWidth > 640 ? 'xl' : 'md'"
+          />
           <UButton
             color="neutral"
             @click="logout"
             :loading="loading"
-            label="Logout"
+            :label="windowWidth > 640 ? 'Logout' : undefined"
             leading-icon="ph:sign-out"
           />
         </div>
@@ -25,6 +28,7 @@
 <script setup lang="ts">
 const supabase = useSupabaseClient();
 const user = useSupabaseUser();
+const { width: windowWidth } = useWindowSize();
 
 const loading = ref<boolean>(false);
 async function logout() {
@@ -39,5 +43,3 @@ async function logout() {
   }
 }
 </script>
-
-<style scoped></style>

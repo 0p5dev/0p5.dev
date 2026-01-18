@@ -15,7 +15,13 @@
       </p>
     </template>
     <template #footer>
-      <UButton label="Cancel" variant="ghost" color="neutral" @click="cancel" />
+      <UButton
+        v-if="!props.loading"
+        label="Cancel"
+        variant="ghost"
+        color="neutral"
+        @click="cancel"
+      />
       <UButton
         label="Terminate"
         color="error"

@@ -13,6 +13,8 @@
         </template>
       </UAuthForm>
     </UPageCard>
+
+    <NuxtLink to="/" class="text-center mt-6 underline">Back Home</NuxtLink>
   </div>
 </template>
 
