@@ -66,8 +66,7 @@
         curl -LO
         {{ downloadUrl }}
         <br />
-        tar -xzf ops_linux_amd64.tgz && sudo mv ./ops_linux_amd64
-        /usr/local/bin/ops
+        tar -xzf ops_Linux_x86_64.tar.gz && sudo mv ./ops /usr/local/bin/ops
       </code>
       <UAlert
         v-else-if="status === 'error'"
@@ -107,8 +106,8 @@ const downloadUrl = computed<string>(() => {
 
 const textCopied = ref<boolean>(false);
 function copyCommandsToClipboard() {
-  const commands = `curl -LO ${release.value.assets[0].browser_download_url}
-tar -xzf ops_linux_amd64.tgz && sudo mv ./ops_linux_amd64 /usr/local/bin/ops`;
+  const commands = `curl -LO ${downloadUrl.value}
+tar -xzf ops_Linux_x86_64.tar.gz && sudo mv ./ops /usr/local/bin/ops`;
   navigator.clipboard.writeText(commands);
   textCopied.value = true;
   setTimeout(() => {
