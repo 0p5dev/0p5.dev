@@ -64,7 +64,7 @@
         class="leading-4 sm:leading-8 text-sm sm:text-base"
       >
         curl -LO
-        {{ release.assets[0].browser_download_url }}
+        {{ downloadUrl }}
         <br />
         tar -xzf ops_linux_amd64.tgz && sudo mv ./ops_linux_amd64
         /usr/local/bin/ops
@@ -96,6 +96,14 @@ const {
     },
   },
 );
+
+const downloadUrl = computed<string>(() => {
+  const urls = release.value?.assets.map(
+    (asset: any) => asset.browser_download_url,
+  );
+  const linux64Url = urls?.find((url: string) => url.includes("Linux_x86_64"));
+  return linux64Url || "";
+});
 
 const textCopied = ref<boolean>(false);
 function copyCommandsToClipboard() {
