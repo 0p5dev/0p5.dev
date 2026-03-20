@@ -16,13 +16,17 @@ export default defineEventHandler(async (event) => {
         if (quotes.length === 4) break;
       }
     }
-    if (quotes.length >= 4) {
+    if (quotes.length >= 4 && quotes[2] !== undefined && quotes[3] !== undefined) {
       accessToken = decodedToken.substring(quotes[2] + 1, quotes[3]);
     }
   }
   // console.log("Access token:", accessToken);
   let body = null;
-  if (isMethod(event, "POST") || isMethod(event, "PUT")) {
+  if (
+    isMethod(event, "POST") ||
+    isMethod(event, "PUT") ||
+    isMethod(event, "PATCH")
+  ) {
     body = await readBody(event);
   }
 

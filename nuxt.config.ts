@@ -1,3 +1,4 @@
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
@@ -20,9 +21,9 @@ export default defineNuxtConfig({
     layoutTransition: { name: "pl", mode: "out-in" },
   },
   runtimeConfig: {
-    controllerBaseUrl: "http://34.58.48.78/api/v1",
-    supabaseDbPassword: "",
+    controllerBaseUrl: "https://controller.0p5.dev/api/v1",
     public: {
+      eventSourceBaseUrl: "https://controller.0p5.dev/api/v1",
       supabaseUrl: "",
       supabaseApiKey: "",
       githubApiToken: "",
@@ -34,4 +35,9 @@ export default defineNuxtConfig({
     cookiePrefix: "0p5dev",
     redirect: false,
   },
+  fonts: {
+    providers: {
+      bunny: false,
+    }
+  }
 });

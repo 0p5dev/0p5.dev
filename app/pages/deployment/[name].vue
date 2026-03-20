@@ -166,6 +166,7 @@ definePageMeta({
 });
 
 const toast = useToast();
+const runtimeConfig = useRuntimeConfig();
 
 interface CloudRunServiceDetails {
   name: string;
@@ -183,7 +184,6 @@ interface CloudRunServiceDetails {
 }
 
 interface UpdateDeploymentPayload {
-  name: string;
   container_image: string;
   min_instances: number;
   max_instances: number;
@@ -223,23 +223,68 @@ const updateLoading = ref<boolean>(false);
 const updateDeployment = async (payload: Partial<UpdateDeploymentPayload>) => {
   updateLoading.value = true;
   let body: UpdateDeploymentPayload = {
-    name: deployment.value!.name,
     container_image: deployment.value!.image,
     min_instances: deployment.value!.scaling.min_instances,
     max_instances: deployment.value!.scaling.max_instances,
   };
   body = { ...body, ...payload };
+
+  let jobId: string | null = null;
+
   try {
-    await $fetch<any>(`/api/deployments`, {
-      method: "PUT",
-      credentials: "include",
-      body,
+    const { job_id } = await $fetch<any>(
+      `/api/deployments/${deployment.value!.name}`,
+      {
+        method: "PATCH",
+        credentials: "include",
+        body,
+      },
+    );
+    jobId = job_id;
+  } catch (err: any) {
+    console.error(err);
+    toast.add({ title: "Error", description: err.message, color: "error" });
+  }
+
+  if (!jobId) {
+    updateLoading.value = false;
+    toast.add({
+      title: "Warning",
+      description:
+        "Failed to watch provisioning job status. Wait a few minutes and refresh the page to check the status of the deployment.",
+      color: "warning",
     });
+    return;
+  }
+
+  try {
+    const eventSource = new EventSource(
+      `${runtimeConfig.public.eventSourceBaseUrl}/provisioning-jobs/${jobId}/status`,
+    );
+
+    await new Promise((resolve, reject) => {
+      eventSource.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.status === "succeeded") {
+          eventSource.close();
+          resolve(true);
+        } else if (data.status === "failed") {
+          eventSource.close();
+          reject(new Error("Provisioning job failed"));
+        }
+      };
+      eventSource.onerror = (err) => {
+        eventSource.close();
+        reject(err);
+      };
+    });
+
     await refresh();
   } catch (err: any) {
     console.error(err);
     toast.add({ title: "Error", description: err.message, color: "error" });
   }
+
   updateLoading.value = false;
 };
 
