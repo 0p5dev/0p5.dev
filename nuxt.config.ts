@@ -27,6 +27,7 @@ export default defineNuxtConfig({
       supabaseUrl: "",
       supabaseApiKey: "",
       githubApiToken: "",
+      stripePublishableKey: "",
     },
   },
   supabase: {

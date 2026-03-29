@@ -3,10 +3,10 @@ set shell := ["/usr/bin/env", "bash", "-c"]
 default: up
 
 up:
-    docker compose up
+    docker compose up webapp
 
 down:
-    docker compose down --rmi local --remove-orphans
+    docker compose down webapp --rmi local --remove-orphans
 
 build:
     npm run build

@@ -1,44 +1,43 @@
 <template>
   <UContainer>
-    <div
-      class="w-screen h-screen overflow-hidden grid place-content-center"
-      v-if="status === 'pending'"
-    >
-      <UIcon name="svg-spinners:3-dots-bounce" />
-    </div>
-    <p v-else-if="status === 'error'">Error loading deployments: {{ error }}</p>
-    <div v-else-if="status === 'success'">
-      <UPageHeader title="Your Deployments" :ui="{ root: 'border-b-0' }" />
-      <UPageGrid>
-        <UPageCard
-          v-for="deployment in data.deployments"
-          :key="deployment.id"
-          :title="deployment.name"
-          :to="`/deployment/${deployment.name}`"
-        >
-          <template #description>
-            <a
-              :href="deployment.url"
-              target="_blank"
-              class="relative z-10 hover:underline"
-              >{{ deployment.url }}</a
-            >
-          </template>
-        </UPageCard>
-      </UPageGrid>
-    </div>
+    <UTabs
+      color="neutral"
+      :content="false"
+      :items="items"
+      default-value=""
+      @update:model-value="handleTabChange"
+    />
+
+    <NuxtPage />
   </UContainer>
 </template>
 
 <script setup lang="ts">
+import type { TabsItem } from "@nuxt/ui";
+
 definePageMeta({
   layout: "dashboard",
 });
 
-const { data, status, error } = await useLazyFetch<any>("/api/deployments", {
-  method: "GET",
-  credentials: "include",
-});
-</script>
+const items = ref<TabsItem[]>([
+  {
+    label: "Overview",
+    icon: "carbon:dashboard",
+    value: "",
+  },
+  {
+    label: "Deployments",
+    icon: "pajamas:deployments",
+    value: "deployments",
+  },
+  {
+    label: "Billing",
+    icon: "bi:credit-card-2-front",
+    value: "billing",
+  },
+]);
 
-<style scoped></style>
+const handleTabChange = async (tab: string | number) => {
+  await navigateTo(`/dashboard/${tab}`);
+};
+</script>

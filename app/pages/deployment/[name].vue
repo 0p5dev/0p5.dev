@@ -22,18 +22,18 @@
       }"
       ,
       :clear="{
-        label: 'Back to dashboard',
+        label: 'Back to deployments',
       }"
-      redirect="/dashboard"
+      redirect="/dashboard/deployments"
     />
     <div v-else-if="status === 'success' && deployment" class="py-5">
       <UButton
         variant="ghost"
         color="neutral"
         size="lg"
-        to="/dashboard"
+        to="/dashboard/deployments"
         icon="ph:arrow-bend-double-up-left-duotone"
-        label="Back to dashboard"
+        label="Back to deployments"
       />
       <UPageCard
         variant="subtle"
