@@ -1,8 +1,29 @@
 <template>
-  <UContainer class="max-w-md mx-auto">
-    <h1>Billing</h1>
+  <UContainer class="max-w-xl mx-auto pb-8">
+    <UPageHeader title="Change Payment Method">
+      <template #headline>
+        <UButton
+          variant="ghost"
+          color="neutral"
+          size="lg"
+          to="/dashboard/billing"
+          icon="ph:arrow-bend-double-up-left-duotone"
+          label="Back to billing"
+        />
+      </template>
+    </UPageHeader>
     <div id="payments" class="my-5"></div>
-    <UButton color="primary" @click="handlePayment" label="Confirm" />
+    <div class="flex justify-center">
+      <UButton
+        v-if="stripeLoaded"
+        color="primary"
+        @click="handlePayment"
+        :loading="isSubmitting"
+        :disabled="isSubmitting"
+        label="Change Payment Method"
+        size="xl"
+      />
+    </div>
   </UContainer>
 </template>
 
@@ -28,6 +49,8 @@ useHead({
 let stripe: Stripe | null = null;
 let elements: StripeElements | undefined = undefined;
 let paymentElement: StripePaymentElement | null = null;
+const stripeLoaded = ref<boolean>(false);
+const isSubmitting = ref<boolean>(false);
 
 onMounted(async () => {
   let setupIntent: string | undefined = undefined;
@@ -63,6 +86,10 @@ onMounted(async () => {
 
   paymentElement = elements.create("payment", { layout: "tabs" });
   paymentElement.mount("#payments");
+
+  setTimeout(() => {
+    stripeLoaded.value = true;
+  }, 750);
 });
 
 const handlePayment = async () => {
@@ -71,15 +98,24 @@ const handlePayment = async () => {
     return;
   }
 
+  isSubmitting.value = true;
+  console.log("Confirming setup intent with Stripe...");
+
   try {
-    await stripe.confirmSetup({
+    const { error } = await stripe.confirmSetup({
       elements,
       confirmParams: {
-        return_url: "http://localhost:3000/dashboard",
+        return_url: "http://localhost:3000/dashboard/billing",
       },
     });
+
+    if (error) {
+      isSubmitting.value = false;
+      return;
+    }
   } catch (error) {
     console.error("Payment failed:", error);
+    isSubmitting.value = false;
   }
 };
 </script>

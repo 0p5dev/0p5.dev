@@ -4,8 +4,7 @@
       color="neutral"
       :content="false"
       :items="items"
-      default-value=""
-      @update:model-value="handleTabChange"
+      v-model="activeTab"
     />
 
     <NuxtPage />
@@ -15,13 +14,15 @@
 <script setup lang="ts">
 import type { TabsItem } from "@nuxt/ui";
 
+const route = useRoute();
+
 definePageMeta({
   layout: "dashboard",
 });
 
 const items = ref<TabsItem[]>([
   {
-    label: "Overview",
+    label: "Dashboard",
     icon: "carbon:dashboard",
     value: "",
   },
@@ -37,7 +38,12 @@ const items = ref<TabsItem[]>([
   },
 ]);
 
-const handleTabChange = async (tab: string | number) => {
-  await navigateTo(`/dashboard/${tab}`);
-};
+const activeTab = computed<string>({
+  get() {
+    return ((route.path.split("/")[2] || "") as string) || "";
+  },
+  set(value: string) {
+    navigateTo(`/dashboard/${value}`);
+  },
+});
 </script>

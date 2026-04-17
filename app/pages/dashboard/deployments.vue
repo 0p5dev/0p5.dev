@@ -7,8 +7,7 @@
       <UIcon name="svg-spinners:3-dots-bounce" />
     </div>
     <p v-else-if="status === 'error'">Error loading deployments: {{ error }}</p>
-    <div v-else-if="status === 'success'">
-      <UPageHeader title="Your Deployments" :ui="{ root: 'border-b-0' }" />
+    <div v-else-if="status === 'success'" class="py-8">
       <UPageGrid>
         <UPageCard
           v-for="deployment in data.deployments"
