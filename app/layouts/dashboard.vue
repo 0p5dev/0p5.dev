@@ -30,6 +30,15 @@ const supabase = useSupabaseClient();
 const user = useSupabaseUser();
 const { width: windowWidth } = useWindowSize();
 
+// const route = useRoute();
+// watch(
+//   () => route,
+//   (newRoute) => {
+//     console.log("Route changed to:", newRoute);
+//   },
+//   { immediate: true },
+// );
+
 const loading = ref<boolean>(false);
 async function logout() {
   loading.value = true;

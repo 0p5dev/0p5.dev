@@ -1,6 +1,8 @@
 <template>
   <UContainer class="max-w-xl mx-auto pb-8">
-    <UPageHeader title="Change Payment Method">
+    <UPageHeader
+      :title="`${hasPaymentMethod ? 'Change' : 'Add'} Payment Method`"
+    >
       <template #headline>
         <UButton
           variant="ghost"
@@ -20,7 +22,7 @@
         @click="handlePayment"
         :loading="isSubmitting"
         :disabled="isSubmitting"
-        label="Change Payment Method"
+        :label="`${hasPaymentMethod ? 'Change' : 'Add'} Payment Method`"
         size="xl"
       />
     </div>
@@ -36,6 +38,10 @@ import type {
 import { loadStripe } from "@stripe/stripe-js";
 
 const runtimeConfig = useRuntimeConfig();
+const user = useSupabaseUser();
+const hasPaymentMethod = computed(() => {
+  return !!user.value?.user_metadata?.app_user?.stripe_payment_method_id;
+});
 
 useHead({
   script: [

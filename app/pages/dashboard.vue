@@ -4,7 +4,10 @@
       color="neutral"
       :content="false"
       :items="items"
+      variant="link"
+      size="xl"
       v-model="activeTab"
+      :ui="{ trigger: 'grow' }"
     />
 
     <NuxtPage />
