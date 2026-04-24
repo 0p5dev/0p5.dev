@@ -46,7 +46,9 @@
         <template #header>
           <UBadge
             :color="deployment.status === 'Ready' ? 'success' : 'error'"
-            :label="deployment.status"
+            :label="
+              deployment.status === 'Ready' ? 'Serving Traffic' : 'Inactive'
+            "
             class="mb-3"
           />
           <h3 class="text-3xl font-semibold">{{ deployment.name }}</h3>

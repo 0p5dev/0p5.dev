@@ -27,3 +27,6 @@ push:
 
 add PACKAGE *FLAGS:
     npm install {{FLAGS}} {{PACKAGE}}
+
+cleanup:
+    npm run cleanup
