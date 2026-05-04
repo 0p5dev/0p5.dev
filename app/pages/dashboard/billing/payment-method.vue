@@ -38,6 +38,7 @@ import type {
 import { loadStripe } from "@stripe/stripe-js";
 
 const runtimeConfig = useRuntimeConfig();
+const supabase = useSupabaseClient();
 const user = useSupabaseUser();
 const hasPaymentMethod = computed(() => {
   return !!user.value?.user_metadata?.app_user?.stripe_payment_method_id;
@@ -113,15 +114,69 @@ const handlePayment = async () => {
       confirmParams: {
         return_url: "http://localhost:3000/dashboard/billing",
       },
+      redirect: "if_required",
     });
 
     if (error) {
       isSubmitting.value = false;
       return;
     }
+
+    const newUser = await waitForUpdatedClaims();
+    console.log("User after payment method update:", newUser);
   } catch (error) {
     console.error("Payment failed:", error);
     isSubmitting.value = false;
   }
+
+  try {
+    const newUser = await waitForUpdatedClaims();
+    console.log("User after payment method update:", newUser);
+  } catch (error) {
+    console.error(
+      "Error refreshing session or waiting for claims update:",
+      error,
+    );
+  }
+
+  // await navigateTo("/dashboard/billing");
+};
+
+const refreshFullAuthSession = async () => {
+  // 1. Get current session to find the refresh token
+  const {
+    data: { session: currentSession },
+  } = await supabase.auth.getSession();
+  if (!currentSession?.refresh_token) throw new Error("No session found");
+
+  // 2. Force a refresh from the server
+  // This triggers the Postgres Hook on the backend
+  const { data, error } = await supabase.auth.refreshSession({
+    refresh_token: currentSession.refresh_token,
+  });
+
+  if (error) throw error;
+
+  // 3. IMPORTANT: Explicitly use the new access token
+  // getUser(token) forces the client to decode the NEW string
+  // rather than relying on the internal state which might be lagging
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser(data.session!.access_token);
+
+  if (userError) throw userError;
+  console.log("Session refreshed, new user data:", user);
+  return user;
+};
+
+const waitForUpdatedClaims = async (maxAttempts = 8, delayMs = 750) => {
+  for (let i = 0; i < maxAttempts; i++) {
+    const user = await refreshFullAuthSession();
+    const appUser = user?.user_metadata?.app_user;
+    if (appUser?.stripe_payment_method_id) return user;
+    await new Promise((r) => setTimeout(r, delayMs));
+  }
+  throw new Error("Session refreshed but app_user claims are still stale");
 };
 </script>

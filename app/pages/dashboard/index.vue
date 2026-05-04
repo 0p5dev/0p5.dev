@@ -73,6 +73,10 @@ const showPaymentMethodExpiredAlert = ref<boolean>(true);
 const { data, status, error, execute } = await useLazyAsyncData<any>(
   "dashboard",
   async () => {
+    // const supabase = useSupabaseClient();
+    // const newUser = await supabase.auth.getUser();
+    // console.log("User after payment method update:", newUser);
+
     const [deploymentsOverview, paymentMethod] = await Promise.allSettled<any>([
       $fetch("/api/deployments", {
         method: "GET",

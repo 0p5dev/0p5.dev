@@ -1,5 +1,6 @@
 export const useHasPaymentMethod = () => useState<boolean>("hasPaymentMethod", () => {
     const user = useSupabaseUser();
+    // console.log("User in useHasPaymentMethod:", user.value);
     return !!user.value?.user_metadata?.app_user?.stripe_payment_method_id;
 });
 
