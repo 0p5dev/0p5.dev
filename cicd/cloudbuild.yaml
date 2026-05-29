@@ -75,5 +75,5 @@ availableSecrets:
       env: "NUXT_PUBLIC_SUPABASE_URL"
     - versionName: projects/160851347747/secrets/ops-controller-supabase-anon-public-key/versions/1
       env: "NUXT_PUBLIC_SUPABASE_API_KEY"
-    - versionName: projects/160851347747/secrets/webapp-github-api-token/versions/2
+    - versionName: projects/160851347747/secrets/webapp-github-api-token/versions/3
       env: "NUXT_PUBLIC_GITHUB_API_TOKEN"
