@@ -1,0 +1,79 @@
+steps:
+  - id: Build/push to AR
+    name: quay.io/buildah/stable:latest
+    secretEnv:
+      - NUXT_PUBLIC_SUPABASE_API_KEY
+      - NUXT_PUBLIC_SUPABASE_URL
+      - NUXT_PUBLIC_GITHUB_API_TOKEN
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        buildah build \
+          --tag $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$SHORT_SHA \
+          --tag $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:latest \
+          --file ./Dockerfile \
+          --format docker \
+          --layers \
+          --env NUXT_PUBLIC_SUPABASE_API_KEY=$$NUXT_PUBLIC_SUPABASE_API_KEY \
+          --env NUXT_PUBLIC_SUPABASE_URL=$$NUXT_PUBLIC_SUPABASE_URL \
+          --env NUXT_PUBLIC_GITHUB_API_TOKEN=$$NUXT_PUBLIC_GITHUB_API_TOKEN \
+          --cache-from $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME/cache \
+          --cache-to $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME/cache \
+          .
+
+        buildah push \
+          $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$SHORT_SHA
+        buildah push \
+          $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:latest
+
+  - id: Upsert Cloud Deploy pipeline
+    name: "gcr.io/google.com/cloudsdktool/cloud-sdk:slim"
+    entrypoint: bash
+    args:
+      - -ceu
+      - |
+        gcloud deploy apply \
+          --project=$_AR_PROJECT_ID \
+          --region=$_DEPLOY_REGION \
+          --file=./cicd/clouddeploy.yaml
+
+  - id: Create Cloud Deploy release
+    name: "gcr.io/google.com/cloudsdktool/cloud-sdk:slim"
+    entrypoint: bash
+    args:
+      - -ceu
+      - |
+        gcloud deploy releases create ${_SERVICE_NAME}-release-${SHORT_SHA} \
+          --project=$_AR_PROJECT_ID \
+          --delivery-pipeline=$_PIPELINE \
+          --skaffold-file=./cicd/skaffold.yaml \
+          --region=$_DEPLOY_REGION \
+          --images=image=$_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$SHORT_SHA
+
+serviceAccount: projects/local-first-476300/serviceAccounts/cloud-build-sa@local-first-476300.iam.gserviceaccount.com
+
+options:
+  substitutionOption: ALLOW_LOOSE
+  logging: CLOUD_LOGGING_ONLY
+
+substitutions:
+  _SERVICE_NAME: webapp
+  _DEPLOY_REGION: us-central1
+  _AR_HOSTNAME: us-central1-docker.pkg.dev
+  _AR_REPOSITORY: open-source-application-images
+  _AR_PROJECT_ID: local-first-476300
+  _PIPELINE: webapp-pipeline
+
+tags:
+  - webapp
+  - opsdev
+
+availableSecrets:
+  secretManager:
+    - versionName: projects/160851347747/secrets/ops-controller-supabase-url/versions/1
+      env: "NUXT_PUBLIC_SUPABASE_URL"
+    - versionName: projects/160851347747/secrets/ops-controller-supabase-anon-public-key/versions/1
+      env: "NUXT_PUBLIC_SUPABASE_API_KEY"
+    - versionName: projects/160851347747/secrets/webapp-github-api-token/versions/2
+      env: "NUXT_PUBLIC_GITHUB_API_TOKEN"
