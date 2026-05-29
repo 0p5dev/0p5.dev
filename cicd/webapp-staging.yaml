@@ -1,0 +1,40 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: webapp-staging
+  annotations:
+    run.googleapis.com/maxScale: 1
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/maxScale: 1
+    spec:
+      serviceAccountName: controller-sa-staging@local-first-476300.iam.gserviceaccount.com
+      containers:
+      - image: image
+        env:
+        - name: NUXT_PUBLIC_SUPABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: ops-controller-supabase-url
+              key: "1"
+        - name: NUXT_PUBLIC_SUPABASE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ops-controller-supabase-anon-public-key
+              key: "1"
+        - name: NUXT_PUBLIC_GITHUB_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: webapp-github-api-token
+              key: "2"
+        - name: NUXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: stripe-publishable-key-staging
+              key: "1"
+        - name: NUXT_CONTROLLER_BASE_URL
+          value: https://staging.controller.0p5.dev/api/v1
+        - name: NUXT_PUBLIC_EVENT_SOURCE_BASE_URL
+          value: https://staging.controller.0p5.dev/api/v1

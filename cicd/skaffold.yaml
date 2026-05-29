@@ -1,0 +1,15 @@
+apiVersion: skaffold/v4beta7
+kind: Config
+metadata: 
+  name: webapp
+profiles:
+- name: staging
+  manifests:
+    rawYaml:
+    - ./webapp-staging.yaml
+- name: production
+  manifests:
+    rawYaml:
+    - ./webapp-production.yaml
+deploy:
+  cloudrun: {}

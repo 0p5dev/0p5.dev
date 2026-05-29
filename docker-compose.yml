@@ -13,13 +13,19 @@ services:
     ports:
       - "3000:3000"
     tty: true
-    entrypoint: ["sh", "-c"]
-    command: ["npm install && npm run dev"]
+    entrypoint: [ "sh", "-c" ]
+    command: [ "npm install && npm run dev" ]
     networks:
       - 0p5dev
     env_file:
       - .env
     environment:
-      NUXT_CONTROLLER_BASE_URL: http://controller:8080/api/v1
-      NUXT_PUBLIC_EVENT_SOURCE_BASE_URL: http://localhost:8080/api/v1
+      # NUXT_CONTROLLER_BASE_URL: http://controller:8080/api/v1
+      # NUXT_PUBLIC_EVENT_SOURCE_BASE_URL: http://localhost:8080/api/v1
+      NUXT_CONTROLLER_BASE_URL: https://staging.controller.0p5.dev/api/v1
+      NUXT_PUBLIC_EVENT_SOURCE_BASE_URL: https://staging.controller.0p5.dev/api/v1
+      NUXT_PUBLIC_SUPABASE_URL: ${NUXT_PUBLIC_SUPABASE_URL}
+      NUXT_PUBLIC_SUPABASE_API_KEY: ${NUXT_PUBLIC_SUPABASE_API_KEY}
+      NUXT_PUBLIC_GITHUB_API_TOKEN: ${NUXT_PUBLIC_GITHUB_API_TOKEN}
+      NUXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NUXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
     user: "${UID-1000}:${GID-1000}"
