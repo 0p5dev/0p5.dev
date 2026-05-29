@@ -28,7 +28,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: webapp-github-api-token
-              key: "2"
+              key: "3"
         - name: NUXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
           valueFrom:
             secretKeyRef:
